@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="Test for PT" default="run" basedir=".">
+
+    <target name="clean">
+        <delete dir="jar"/>
+        <delete dir="reports"/>
+        <delete dir="bin" />
+    </target>
+
+    <target name="create" depends="clean">
+        <mkdir dir="jar"/>
+        <mkdir dir="reports"/>
+        <mkdir dir="bin" />
+        <mkdir dir="bin/icons" />
+        <mkdir dir="bin/icons_player" />
+        <mkdir dir="bin/3d" />
+    </target>
+
+    <path id="classpath">
+        <path location="lib">
+            <fileset dir="lib" includes="*.jar"></fileset>
+        </path>
+        <path location="bin"></path>
+    </path>
+
+    <target name="copy" depends="create">
+        <copy overwrite="true" todir="bin/icons">
+            <fileset dir="src/icons" includes="*.png"></fileset>
+        </copy>
+        <copy overwrite="true" todir="bin/icons_player">
+            <fileset dir="src/icons_player" includes="*.png"></fileset>
+        </copy>
+        <copy overwrite="true" todir="bin/3d">
+            <fileset dir="src/3d" includes="*.jpg"></fileset>
+        </copy>
+    </target>
+
+    <target name="compile" depends="copy">
+        <javac destdir="bin" classpathref="classpath" includeantruntime="true">
+            <src path="src/model"/>
+            <src path="src/controller"/>
+            <src path="src/ui_main"/>
+            <src path="src/test"/>
+            <src path="src/view"/>
+        </javac>
+        <!--<javac classpathref="classpath" includeantruntime="true" srcdir="src/model" destdir="bin" description="Compile Model" includes="*.java"></javac>
+        <javac classpathref="classpath" includeantruntime="true" srcdir="src/controller" destdir="bin" description="Compile Controller" includes="*.java"></javac>
+        <javac classpathref="classpath" includeantruntime="true" srcdir="src/ui_main" destdir="bin" description="Compile UI Main" includes="*.java"></javac>
+        <javac classpathref="classpath" includeantruntime="true" srcdir="src/test" destdir="bin" description="Compile Test" includes="*.java"></javac>
+        <javac classpathref="classpath" includeantruntime="true" srcdir="src/view" destdir="bin" description="Compile View" includes="*.java"></javac>-->
+    </target>
+
+    <target name="test" depends="compile">
+        <junit haltonfailure="false" printsummary="true">
+            <classpath refid="classpath"></classpath>
+            <test name="test.TestGestionnaire" todir="reports"></test>
+            <formatter type="plain"/>
+        </junit>
+    </target>
+
+    <target name="jar" depends="test">
+        <jar destfile="jar/Maze.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="ui_main.Fenetre"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="bin"/>
+        </jar>
+    </target>
+
+    <target name="run" depends="jar">
+        <java fork="true" jar="jar/Maze.jar">
+        </java>
+    </target>
+
+</project>
